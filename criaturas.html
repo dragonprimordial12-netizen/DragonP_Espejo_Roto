@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📜 Enciclopedia de Criaturas · Dragón Primordial</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&family=MedievalSharp&display=swap" rel="stylesheet">
+<style>
+:root {
+  --parch: #1a1208;
+  --parch2: #221a0a;
+  --ink: #e8d8b0;
+  --ink2: #c4a96a;
+  --rune: #8b6914;
+  --blood: #8b1a1a;
+  --blood2: #c0392b;
+  --gold: #d4a017;
+  --gold2: #f0c040;
+  --muted: #7a6040;
+  --border: rgba(180,140,40,0.25);
+  --dark: #0d0a04;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--dark);
+  color:var(--ink);
+  font-family:'IM Fell English',Georgia,serif;
+  overflow-x:hidden;
+  min-height:100vh;
+  cursor:default;
+}
+
+/* ── TEXTURA PERGAMINO ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(180,140,20,0.012) 40px,rgba(180,140,20,0.012) 41px),
+    repeating-linear-gradient(90deg,transparent,transparent 60px,rgba(180,140,20,0.008) 60px,rgba(180,140,20,0.008) 61px);
+  pointer-events:none;z-index:0;
+}
+
+/* ── CANVAS FONDO ── */
+#bgCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.6;}
+
+/* ── RUNAS FLOTANTES FONDO ── */
+.rune-bg{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  overflow:hidden;
+}
+.rune-char{
+  position:absolute;
+  font-family:'Cinzel',serif;
+  color:rgba(180,140,20,0.04);
+  font-size:clamp(3rem,8vw,7rem);
+  font-weight:700;
+  animation:runeDrift linear infinite;
+  user-select:none;
+}
+@keyframes runeDrift{
+  from{transform:translateY(110vh) rotate(0deg);opacity:0;}
+  10%{opacity:1;}
+  90%{opacity:0.5;}
+  to{transform:translateY(-10vh) rotate(20deg);opacity:0;}
+}
+
+/* ── NAV ── */
+.top-bar{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  background:rgba(13,10,4,0.97);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0.6rem 1.5rem;flex-wrap:wrap;gap:0.5rem;
+}
+.top-logo{
+  font-family:'Cinzel Decorative',serif;font-size:0.75rem;
+  background:linear-gradient(90deg,var(--gold),var(--gold2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.top-links{display:flex;gap:0.4rem;flex-wrap:wrap;}
+.top-links a{
+  color:var(--muted);text-decoration:none;font-family:'Cinzel',serif;
+  font-size:0.5rem;letter-spacing:0.1em;padding:0.25rem 0.6rem;
+  border:1px solid rgba(180,140,40,0.15);
+  clip-path:polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%);
+  transition:all 0.2s;
+}
+.top-links a:hover{color:var(--gold2);border-color:var(--gold);}
+.top-links a.active{color:var(--gold2);border-color:var(--gold);background:rgba(180,140,20,0.08);}
+
+/* ── HERO ── */
+.hero{
+  position:relative;z-index:1;
+  text-align:center;padding:7rem 2rem 3rem;
+  background:radial-gradient(ellipse 80% 60% at 50% 100%,rgba(139,26,26,0.15) 0%,transparent 70%);
+}
+.hero-seal{
+  font-size:3.5rem;margin-bottom:0.8rem;
+  display:block;
+  filter:drop-shadow(0 0 20px rgba(212,160,23,0.5));
+  animation:sealPulse 4s ease-in-out infinite;
+}
+@keyframes sealPulse{0%,100%{filter:drop-shadow(0 0 15px rgba(212,160,23,0.4));}50%{filter:drop-shadow(0 0 30px rgba(212,160,23,0.7));}}
+.hero-eyebrow{
+  font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.5em;
+  color:var(--rune);text-transform:uppercase;margin-bottom:0.8rem;
+  animation:fadeDown 0.8s ease both;
+}
+.hero h1{
+  font-family:'Cinzel Decorative',serif;
+  font-size:clamp(1.4rem,5vw,3.2rem);
+  background:linear-gradient(150deg,var(--gold2) 0%,var(--gold) 40%,var(--blood2) 80%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 20px rgba(212,160,23,0.3));
+  animation:blazeIn 1s ease both;line-height:1.2;
+}
+.hero-sub{
+  font-style:italic;color:#a09060;
+  font-size:clamp(0.85rem,1.8vw,1rem);
+  margin-top:0.8rem;max-width:580px;margin-left:auto;margin-right:auto;
+  line-height:1.8;
+}
+/* separador ornamental */
+.orn{
+  display:flex;align-items:center;justify-content:center;
+  gap:1rem;margin:1.5rem auto 0;max-width:400px;color:var(--rune);
+  font-size:0.7rem;letter-spacing:0.3em;opacity:0.6;
+}
+.orn::before,.orn::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--rune));}
+.orn::after{background:linear-gradient(90deg,var(--rune),transparent);}
+
+/* ── FILTER BAR ── */
+.filter-bar{
+  position:relative;z-index:1;
+  max-width:1000px;margin:2rem auto 1rem;padding:0 1.5rem;
+  display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center;justify-content:center;
+}
+.search-box{
+  background:rgba(0,0,0,0.5);
+  border:1px solid rgba(180,140,40,0.2);
+  color:var(--ink);font-family:'Cinzel',serif;font-size:0.68rem;
+  padding:0.55rem 1rem;outline:none;width:220px;
+  clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
+  transition:border-color 0.25s;
+}
+.search-box:focus{border-color:var(--gold);}
+.search-box::placeholder{color:var(--muted);}
+.filter-btn{
+  background:rgba(139,105,20,0.08);
+  border:1px solid rgba(180,140,40,0.18);
+  color:var(--muted);font-family:'Cinzel',serif;font-size:0.52rem;
+  letter-spacing:0.1em;padding:0.4rem 0.9rem;cursor:pointer;
+  clip-path:polygon(5px 0%,100% 0%,calc(100% - 5px) 100%,0% 100%);
+  transition:all 0.2s;
+}
+.filter-btn:hover,.filter-btn.active{color:var(--gold2);border-color:var(--gold);background:rgba(139,105,20,0.2);}
+.count-lbl{font-style:italic;font-size:0.68rem;color:var(--muted);}
+
+/* ── SECTION HEADER ── */
+.section-header{
+  position:relative;z-index:1;
+  max-width:1000px;margin:2.5rem auto 1rem;padding:0 1.5rem;
+  display:flex;align-items:center;gap:1rem;
+}
+.section-header-title{
+  font-family:'Cinzel Decorative',serif;font-size:0.9rem;
+  color:var(--gold);white-space:nowrap;
+  text-shadow:0 0 12px rgba(212,160,23,0.3);
+}
+.section-header-line{flex:1;height:1px;background:linear-gradient(90deg,var(--rune),transparent);opacity:0.4;}
+
+/* ── GRID ── */
+.creatures-grid{
+  position:relative;z-index:1;
+  max-width:1000px;margin:0 auto;padding:0 1.5rem 2rem;
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1.2rem;
+}
+
+/* ── CARD ── */
+.creature-card{
+  background:linear-gradient(145deg,rgba(26,18,8,0.97),rgba(18,12,3,0.97));
+  border:1px solid var(--border);
+  clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);
+  padding:1.4rem;cursor:pointer;
+  transition:all 0.3s;position:relative;overflow:hidden;
+}
+.creature-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--blood),var(--gold),var(--blood),transparent);
+  opacity:0.4;transition:opacity 0.3s;
+}
+.creature-card::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at var(--mx,50%) var(--my,50%),rgba(180,140,20,0.06) 0%,transparent 60%);
+  opacity:0;transition:opacity 0.3s;pointer-events:none;
+}
+.creature-card:hover{transform:translateY(-5px);border-color:rgba(212,160,23,0.5);box-shadow:0 12px 30px rgba(0,0,0,0.5),0 0 20px rgba(139,26,26,0.1);}
+.creature-card:hover::before{opacity:1;}
+.creature-card:hover::after{opacity:1;}
+
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.7rem;gap:0.5rem;}
+.card-icon{font-size:2rem;filter:drop-shadow(0 0 8px rgba(212,160,23,0.4));transition:transform 0.3s,filter 0.3s;flex-shrink:0;}
+.creature-card:hover .card-icon{transform:scale(1.15);filter:drop-shadow(0 0 16px rgba(212,160,23,0.7));}
+.card-badges{display:flex;flex-direction:column;align-items:flex-end;gap:0.3rem;}
+.badge-myth{font-family:'Cinzel',serif;font-size:0.48rem;letter-spacing:0.1em;color:var(--blood2);background:rgba(139,26,26,0.15);border:1px solid rgba(139,26,26,0.3);padding:0.15rem 0.4rem;}
+.badge-type{font-family:'Cinzel',serif;font-size:0.45rem;letter-spacing:0.08em;color:var(--rune);padding:0.1rem 0.3rem;border:1px solid rgba(139,105,20,0.2);}
+.card-name{font-family:'Cinzel Decorative',serif;font-size:0.82rem;color:var(--gold2);line-height:1.3;margin-bottom:0.2rem;filter:drop-shadow(0 0 5px rgba(212,160,23,0.2));}
+.card-origin{font-size:0.62rem;color:var(--rune);letter-spacing:0.1em;font-style:normal;font-family:'Cinzel',serif;margin-bottom:0.6rem;}
+.card-desc{font-style:italic;font-size:0.74rem;color:#a09060;line-height:1.55;margin-bottom:1rem;}
+.card-traits{display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:1rem;}
+.trait{font-family:'Cinzel',serif;font-size:0.45rem;letter-spacing:0.08em;color:var(--muted);background:rgba(0,0,0,0.3);border:1px solid rgba(180,140,40,0.1);padding:0.18rem 0.45rem;}
+.card-btn{
+  display:inline-flex;align-items:center;gap:0.4rem;
+  font-family:'Cinzel',serif;font-size:0.5rem;letter-spacing:0.12em;
+  color:var(--gold);background:rgba(139,105,20,0.08);
+  border:1px solid rgba(212,160,23,0.25);
+  padding:0.4rem 0.9rem;cursor:pointer;
+  clip-path:polygon(5px 0%,100% 0%,calc(100% - 5px) 100%,0% 100%);
+  transition:all 0.2s;text-decoration:none;
+}
+.card-btn:hover{background:rgba(139,105,20,0.2);border-color:var(--gold);color:var(--gold2);}
+
+/* ── MODAL ── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(5,4,2,0.96);backdrop-filter:blur(18px);
+  align-items:center;justify-content:center;padding:1.5rem;
+}
+.modal-overlay.show{display:flex;animation:fadeIn 0.3s ease both;}
+.modal{
+  background:linear-gradient(145deg,rgba(26,18,8,0.99),rgba(13,10,4,0.99));
+  border:1px solid rgba(212,160,23,0.35);
+  clip-path:polygon(16px 0%,100% 0%,calc(100% - 16px) 100%,0% 100%);
+  padding:2rem;max-width:620px;width:100%;max-height:85vh;overflow-y:auto;
+  position:relative;
+}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--blood),var(--gold),var(--blood),transparent);}
+.modal-close{position:absolute;top:0.8rem;right:1rem;background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;transition:color 0.2s;font-family:'Cinzel',serif;}
+.modal-close:hover{color:var(--gold2);}
+.modal-icon{font-size:3rem;text-align:center;display:block;margin-bottom:0.5rem;filter:drop-shadow(0 0 20px rgba(212,160,23,0.5));}
+.modal-name{font-family:'Cinzel Decorative',serif;font-size:1.2rem;color:var(--gold2);text-align:center;margin-bottom:0.2rem;}
+.modal-origin{font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.2em;color:var(--blood2);text-align:center;text-transform:uppercase;margin-bottom:1.2rem;}
+.modal-sec{margin-bottom:1rem;}
+.modal-sec-title{font-family:'Cinzel',serif;font-size:0.58rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0.35rem;padding-bottom:0.2rem;border-bottom:1px solid rgba(212,160,23,0.12);}
+.modal-text{font-style:italic;font-size:0.8rem;color:#b8a070;line-height:1.7;}
+.modal-traits{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.4rem;}
+.modal-trait{font-family:'Cinzel',serif;font-size:0.48rem;letter-spacing:0.08em;color:var(--muted);background:rgba(0,0,0,0.3);border:1px solid rgba(180,140,40,0.12);padding:0.2rem 0.5rem;}
+.modal-footer{margin-top:1.5rem;text-align:center;}
+.modal-galeria-btn{
+  display:inline-flex;align-items:center;gap:0.5rem;
+  font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.15em;
+  text-transform:uppercase;padding:0.65rem 1.5rem;
+  background:linear-gradient(135deg,rgba(139,26,26,0.4),rgba(100,60,0,0.4));
+  color:var(--gold2);border:1px solid rgba(212,160,23,0.35);
+  clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+  text-decoration:none;transition:all 0.25s;
+}
+.modal-galeria-btn:hover{background:linear-gradient(135deg,rgba(139,26,26,0.6),rgba(100,60,0,0.6));box-shadow:0 0 20px rgba(212,160,23,0.2);}
+
+/* ── DIVIDER ── */
+.divider{
+  position:relative;z-index:1;
+  width:100%;height:1px;margin:1rem 0;
+  background:linear-gradient(90deg,transparent,var(--rune),var(--gold),var(--rune),transparent);
+  opacity:0.4;
+}
+.divider::before{content:'✦';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--dark);padding:0 0.8rem;color:var(--rune);font-size:0.7rem;}
+
+/* ── FOOTER ── */
+footer{
+  position:relative;z-index:1;text-align:center;
+  padding:1.5rem 2rem;border-top:1px solid rgba(180,140,40,0.1);
+  font-size:0.6rem;color:var(--muted);font-style:italic;
+}
+footer a{color:var(--rune);text-decoration:none;}footer a:hover{color:var(--gold);}
+
+/* ── EMPTY ── */
+.empty-msg{
+  position:relative;z-index:1;text-align:center;
+  padding:4rem 2rem;grid-column:1/-1;
+  font-style:italic;color:var(--muted);font-size:0.9rem;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes blazeIn{from{opacity:0;transform:scale(0.92);filter:blur(6px)}to{opacity:1;transform:scale(1);filter:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity 0.6s ease,transform 0.6s ease;}
+.reveal.visible{opacity:1;transform:none;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--dark);}
+::-webkit-scrollbar-thumb{background:linear-gradient(var(--blood),var(--gold));}
+</style>
+</head>
+<body>
+
+<!-- RUNAS FLOTANTES -->
+<div class="rune-bg" id="runeBg"></div>
+<canvas id="bgCanvas"></canvas>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modalContent">
+    <button class="modal-close" onclick="closeModal()">✕ cerrar</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="top-bar">
+  <span class="top-logo">🐉 DRAGÓN PRIMORDIAL</span>
+  <div class="top-links">
+    <a href="index.html">📋 Peticiones</a>
+    <a href="galeria.html">🐉 Galería</a>
+    <a href="criaturas.html" class="active">📜 Criaturas</a>
+    <a href="https://www.roblox.com/es/games/103451711855402/BESTIAS-Y-MONSTRUOS" target="_blank">⚔ Roblox</a>
+    <a href="https://discord.com/channels/1489401096530301128/1489401098518139032" target="_blank">💬 Discord</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="hero-seal">📜</span>
+  <p class="hero-eyebrow">Dragón Primordial · Archivos Ancestrales</p>
+  <h1>ENCICLOPEDIA DE<br>CRIATURAS MÍTICAS</h1>
+  <p class="hero-sub">
+    Compendio de las bestias legendarias que han poblado los mitos del mundo.<br>
+    ¿Inspírate y crea una petición para el juego?
+  </p>
+  <div class="orn">✦ &nbsp; In nomine draconis &nbsp; ✦</div>
+</div>
+
+<div class="divider"></div>
+
+<!-- FILTROS -->
+<div class="filter-bar reveal">
+  <input class="search-box" type="text" id="searchInput" placeholder="🔍 Buscar criatura..." oninput="filtrar()">
+  <button class="filter-btn active" onclick="setFiltro('todos',this)">TODAS</button>
+  <button class="filter-btn" onclick="setFiltro('dragon',this)">🐉 Dragones</button>
+  <button class="filter-btn" onclick="setFiltro('griega',this)">🏛️ Griega</button>
+  <button class="filter-btn" onclick="setFiltro('nordica',this)">⚡ Nórdica</button>
+  <button class="filter-btn" onclick="setFiltro('japonesa',this)">🌸 Japonesa</button>
+  <button class="filter-btn" onclick="setFiltro('azteca',this)">🌞 Azteca</button>
+  <button class="filter-btn" onclick="setFiltro('china',this)">☯️ China</button>
+  <button class="filter-btn" onclick="setFiltro('otra',this)">🌍 Otras</button>
+  <span class="count-lbl" id="countLbl"></span>
+</div>
+
+<!-- GRID -->
+<div id="mainGrid"></div>
+
+<div class="divider" style="margin:2rem 0 1rem;"></div>
+
+<footer>
+  📜 <strong style="color:var(--rune);">ENCICLOPEDIA MÍTICA</strong> · Dragón Primordial · Bestias y Monstruos<br>
+  <span style="font-size:0.55rem;">
+    <a href="index.html">📋 Enviar Petición</a> ·
+    <a href="galeria.html">🐉 Galería de Bestias</a> ·
+    <a href="https://www.roblox.com/es/games/103451711855402/BESTIAS-Y-MONSTRUOS" target="_blank">🎮 Jugar en Roblox</a> ·
+    <a href="https://www.paypal.com/paypalme/DragonPrimordial" target="_blank">💙 PayPal</a> ·
+    <a href="https://ko-fi.com/dragonprimordial" target="_blank">☕ Ko-fi</a>
+  </span>
+</footer>
+
+<script>
+// ==================== DATOS ====================
+const CRIATURAS = [
+  // ===== DRAGONES DEL MUNDO =====
+  {
+    id:'dragon-europeo', icon:'🐉', nombre:'Dragón Europeo', origen:'Mitología Medieval Europea',
+    mitologia:'dragon', tipo:'Reptil Alado',
+    descripcion:'El dragón clásico de la Europa medieval — serpiente colosal con alas de murciélago, aliento de fuego y escamas impenetrables. Guardián de tesoros y terror de reinos.',
+    lore:'En los relatos medievales europeos, el dragón simbolizaba el mal que los caballeros debían vencer. Vivía en cuevas, raptaba doncellas y acumulaba oro. Solo un héroe puro podía derrotarlo — aunque algunos textos sugieren que el dragón era, en realidad, el verdadero sabio del relato.',
+    poderes:['Aliento de fuego','Vuelo','Piel impenetrable','Inteligencia superior','Hipnosis visual'],
+    debilidades:['Vientre blando','Vanidad','Oro (lo distrae)'],
+    traits:['Fuego','Medieval','Occidental','Dragón']
+  },
+  {
+    id:'dragon-chino', icon:'🐲', nombre:'Lóng (龍)', origen:'Mitología China',
+    mitologia:'dragon', tipo:'Serpiente Celestial',
+    descripcion:'El dragón chino: serpiente sin alas que vuela por voluntad propia. Símbolo de poder imperial, lluvia y prosperidad. Benévolo y sabio, opuesto al dragón occidental.',
+    lore:'El Lóng es uno de los cuatro seres divinos de la mitología china. Habita en el fondo del mar o en las nubes. Los emperadores reclamaban descendencia del dragón. Tiene 9 hijos, cada uno con un poder diferente. No escupe fuego: controla el agua y la lluvia.',
+    poderes:['Control del agua','Vuelo sin alas','Transformación','Inmortalidad','Control climático'],
+    debilidades:['Hierro','Hojas de bambú azul (leyenda)'],
+    traits:['Agua','China','Celestial','Dragón']
+  },
+  {
+    id:'ryu', icon:'🌊', nombre:'Ryū (龍)', origen:'Mitología Japonesa',
+    mitologia:'dragon', tipo:'Dios del Mar',
+    descripcion:'El dragón japonés habita en el fondo del océano en palacios de cristal. Serpentino, con garras de tres dedos y antenas. Dios del agua y de las tormentas marinas.',
+    lore:'Ryūjin, el rey dragón del mar, poseía el Palacio del Dragón bajo el océano. Su joya mágica controlaba las mareas. Algunos héroes japoneses descienden de dragones marinos. En el folclore, cambiar de forma y aparecer como anciano sabio era algo habitual para los Ryū.',
+    poderes:['Control del océano','Cambio de forma','Control de mareas','Veneno','Tormenta marina'],
+    debilidades:['Alejarse del agua','Tierra seca'],
+    traits:['Agua','Japonesa','Oceánico','Dragón']
+  },
+  {
+    id:'quetzalcoatl', icon:'🌞', nombre:'Quetzalcóatl', origen:'Mitología Azteca',
+    mitologia:'dragon', tipo:'Serpiente Emplumada',
+    descripcion:'La Serpiente Emplumada — dragón alado de plumas verdes de quetzal. Dios del viento, la sabiduría y el amanecer. Una de las deidades más importantes del panteón mesoamericano.',
+    lore:'Quetzalcóatl creó a la humanidad usando su propia sangre. Enseñó las artes, la escritura y el calendario. Cuando fue desterrado, prometió regresar — leyenda que los aztecas confundieron con la llegada de Cortés. Su rival eterno era Tezcatlipoca, dios de la noche.',
+    poderes:['Vuelo','Control del viento','Sabiduría divina','Creación','Luz del amanecer'],
+    debilidades:['Engaño (fue derrotado mediante ilusiones)'],
+    traits:['Viento','Azteca','Divino','Serpiente Emplumada']
+  },
+  {
+    id:'fafnir', icon:'💀', nombre:'Fáfnir', origen:'Mitología Nórdica',
+    mitologia:'dragon', tipo:'Dragón Maldito',
+    descripcion:'Enano transformado en dragón por la codicia. Guardián del oro maldito de los Nibelungos. Fue derrotado por Sigurd — y su sangre otorgó el don de entender el lenguaje de los pájaros.',
+    lore:'Fáfnir era hijo del mago Hreidmar. Al robar el oro de Andvari, fue corrompido por su codicia hasta transformarse físicamente en dragón. Yacía sobre el tesoro Andvaranaut. El héroe Sigurd lo mató atravesándolo desde abajo mientras dormía. Su corazón, al ser comido, otorgaba sabiduría.',
+    poderes:['Aliento venenoso','Piel como acero','Terror psíquico','Maldición del oro'],
+    debilidades:['Vientre sin escamas','Fue muerto por debajo'],
+    traits:['Veneno','Nórdica','Maldito','Dragón']
+  },
+  {
+    id:'wyvern', icon:'⚔️', nombre:'Wyvern', origen:'Heráldica Medieval Europea',
+    mitologia:'dragon', tipo:'Dragón Bípedo',
+    descripcion:'El Wyvern tiene dos patas y alas — a diferencia del dragón de cuatro patas. Símbolo en escudos de armas de guerra. Más salvaje e instintivo que el dragón clásico.',
+    lore:'El Wyvern aparece en la heráldica de caballeros y reinos medievales como símbolo de fuerza y ferocidad. No habla ni acumula tesoros — es pura bestia. Algunas leyendas lo relacionan con la plaga, pues su aliento envenena el aire. El rey Ricardo III de Inglaterra usaba un Wyvern blanco.',
+    poderes:['Vuelo veloz','Cola con aguijón venenoso','Aliento pestilente','Fuerza bruta'],
+    debilidades:['Inteligencia limitada','Sin escamas en las alas'],
+    traits:['Veneno','Medieval','Bípedo','Dragón']
+  },
+  {
+    id:'naga', icon:'🐍', nombre:'Nāga', origen:'Mitología Hindu / Budista',
+    mitologia:'dragon', tipo:'Serpiente Divina',
+    descripcion:'Las Nāga son serpientes divinas con cuerpo de cobra y torso humano. Guardianas de las aguas y el inframundo. Veneradas en el hinduismo y el budismo.',
+    lore:'En la mitología hindú, las Nāga habitan el Pātāla (inframundo). Vasuki, rey de las serpientes, fue usado como cuerda en el batido del océano cósmico. En el budismo, Mucalinda-Nāga protegió a Buda de las tormentas. Pueden ser benévolas o destructivas según cómo se les trate.',
+    poderes:['Control del agua','Veneno mortal','Transformación humana','Inmortalidad','Sabiduría oculta'],
+    debilidades:['Garuda (el águila divina)','Magia de tierra'],
+    traits:['Agua','Hindu','Serpiente','Divino']
+  },
+  {
+    id:'zmey', icon:'🔥', nombre:'Zmey Gorynych', origen:'Folclore Eslavo',
+    mitologia:'dragon', tipo:'Dragón de Tres Cabezas',
+    descripcion:'El dragón eslavo de tres cabezas — cada una escupe fuego. Rapta princesas, desafía a héroes y renace. Simboliza la tiranía y el caos en la tradición rusa y ucraniana.',
+    lore:'Zmey Gorynych aparece en los byliny (épicas rusas). El héroe Dobrynya Nikitich lo derrotó con su sombrero de tierra sagrada. Cada cabeza regenera si no se quema completamente. Algunos textos describen hasta 12 cabezas. Su nombre significa "serpiente de la montaña".',
+    poderes:['Tres cabezas de fuego','Regeneración de cabezas','Vuelo','Transformación','Tormenta'],
+    debilidades:['Quemar todas las cabezas simultáneamente'],
+    traits:['Fuego','Eslava','Tres Cabezas','Dragón']
+  },
+
+  // ===== OTRAS CRIATURAS =====
+  {
+    id:'grifo', icon:'🦅', nombre:'Grifo', origen:'Mitología Greco-Persa',
+    mitologia:'griega', tipo:'Bestia Híbrida',
+    descripcion:'Cuerpo de león, cabeza y alas de águila. Rey de todas las bestias y el aire. Guardián de tesoros y símbolo de fuerza divina. Considerado el animal más poderoso del mundo antiguo.',
+    lore:'Los antiguos griegos creían que los grifos vivían en las montañas de Escitia, donde guardaban oro. Herodoto los mencionó. En la heráldica medieval se convirtió en símbolo de Christ — mitad cielo (águila) mitad tierra (león). Se decía que sus huesos podían detectar venenos.',
+    poderes:['Vuelo','Fuerza leonina','Vista de águila','Detección de venenos','Velocidad extrema'],
+    debilidades:['Lealtad absoluta (puede ser manipulado)'],
+    traits:['Híbrido','Griega','Guardián','Alado']
+  },
+  {
+    id:'fenix', icon:'🔥', nombre:'Fénix', origen:'Mitología Griega / Egipcia',
+    mitologia:'griega', tipo:'Ave Inmortal',
+    descripcion:'El ave inmortal que renace de sus propias cenizas cada 500 años. Símbolo de resurrección, eternidad y renovación. Su canto sana y su llanto cura enfermedades.',
+    lore:'Los griegos la llamaron Phoinix. Los egipcios la asociaron al Bennu, ave sagrada de Heliópolis. Solo existe un Fénix a la vez. Al morir, construye un nido de canela y mirra, se inmola y renace de las cenizas. Sus plumas brillan como oro y rojo solar.',
+    poderes:['Inmortalidad cíclica','Llamas sanadoras','Canto hipnótico','Lágrimas curativas','Vuelo solar'],
+    debilidades:['Solo puede morir por propia voluntad'],
+    traits:['Fuego','Griega','Inmortal','Ave']
+  },
+  {
+    id:'quimera', icon:'🦁', nombre:'Quimera', origen:'Mitología Griega',
+    mitologia:'griega', tipo:'Monstruo Compuesto',
+    descripcion:'Cabeza de león, cuerpo de cabra, cola de serpiente. Escupía fuego. Hija de Tifón y Equidna — los padres de todos los monstruos. Fue derrotada por Belerofonte montando a Pegaso.',
+    lore:'La Quimera asolaba Licia. El rey Iobates envió a Belerofonte a matarla — esperando que muriera. Belerofonte montó a Pegaso, el caballo alado, y disparó flechas con punta de plomo que se fundieron en su garganta de fuego. El nombre pasó al idioma como sinónimo de lo imposible.',
+    poderes:['Aliento de fuego','Tres naturalezas','Veneno de serpiente','Fuerza brutal'],
+    debilidades:['Boca — punto débil al fuego propio'],
+    traits:['Fuego','Griega','Híbrido','Monstruo']
+  },
+  {
+    id:'minotauro', icon:'🐂', nombre:'Minotauro', origen:'Mitología Griega',
+    mitologia:'griega', tipo:'Híbrido Humano-Toro',
+    descripcion:'Cuerpo de hombre, cabeza de toro. Encerrado en el Laberinto de Creta, era alimentado con jóvenes atenienses. Solo Teseo, con el hilo de Ariadna, pudo derrotarlo.',
+    lore:'El Minotauro, llamado Asterión, era hijo de Pasífae y un toro sagrado de Poseidón. El rey Minos lo ocultó en el Laberinto diseñado por Dédalo. Teseo lo mató con la espada, usando el hilo de Ariadna para no perderse en el laberinto. Simboliza la parte animal que habita en lo humano.',
+    poderes:['Fuerza sobrehumana','Resistencia de toro','Dominio del laberinto','Ira ciega'],
+    debilidades:['Sin orientación fuera del laberinto','Ira lo hace predecible'],
+    traits:['Fuerza','Griega','Laberinto','Híbrido']
+  },
+  {
+    id:'fenrir', icon:'🐺', nombre:'Fenrir', origen:'Mitología Nórdica',
+    mitologia:'nordica', tipo:'Lobo Cósmico',
+    descripcion:'El lobo gigante hijo de Loki. Tan poderoso que los dioses lo encadenaron con Gleipnir — una cuerda mágica hecha de imposibles. En el Ragnarök, romperá sus cadenas y devorará a Odín.',
+    lore:'Fenrir creció tan deprisa que los Æsir lo ataron. Desconfió del lazo mágico Gleipnir — tan fino como seda — y solo aceptó si un dios metía la mano en su boca. Tyr sacrificó su mano. En el Ragnarök, Fenrir matará a Odín y será muerto por Víðarr. Su nombre significa "el que vive en el pantano".',
+    poderes:['Fuerza ilimitada','Mandíbula que toca el cielo','Velocidad sobrenatural','Aliento de veneno cósmico'],
+    debilidades:['Gleipnir (la cuerda mágica)','La espada de Víðarr'],
+    traits:['Oscuridad','Nórdica','Cósmico','Lobo']
+  },
+  {
+    id:'jormungandr', icon:'🌊', nombre:'Jörmungandr', origen:'Mitología Nórdica',
+    mitologia:'nordica', tipo:'Serpiente Mundial',
+    descripcion:'La Serpiente de Midgard — tan larga que rodea el mundo entero mordiéndose la cola. Hijo de Loki. Su enemigo eterno es Thor. Cuando suelte su cola, comenzará el Ragnarök.',
+    lore:'Jörmungandr fue arrojado al océano por Odín. Creció hasta rodear Midgard. Thor lo pesó pensando que era un gato — y casi levantó el mundo. En el Ragnarök, se enfrentarán: Thor lo matará pero morirá envenenado tras dar nueve pasos. El Ouroboros — serpiente que se muerde la cola — viene de esta imagen.',
+    poderes:['Tamaño cósmico','Veneno apocalíptico','Control de océanos','Inmortalidad cíclica'],
+    debilidades:['Solo puede ser herido por armas forjadas con magia de enanos'],
+    traits:['Veneno','Nórdica','Cósmico','Serpiente']
+  },
+  {
+    id:'kitsune', icon:'🦊', nombre:'Kitsune', origen:'Folclore Japonés',
+    mitologia:'japonesa', tipo:'Zorro Espiritual',
+    descripcion:'Zorro mágico con hasta nueve colas. Cada cola representa 100 años de vida y poder creciente. Mensajero del dios Inari, puede ser trickster o guardián benévolo según sus intenciones.',
+    lore:'El Kitsune puede transformarse en humano — especialmente en mujer hermosa. Sus nueve colas son señal de máxima sabiduría y poder divino. Sirve al dios Inari como mensajero. Puede crear ilusiones tan perfectas que abarcan ciudades enteras. Sus fuegos de zorro (kitsune-bi) flotan en la noche.',
+    poderes:['Transformación','Ilusiones','Fuego de zorro','Posesión','Magia elemental por cola'],
+    debilidades:['Perros (los revelan)','Incapaz de ocultar su sombra de zorro'],
+    traits:['Magia','Japonesa','Trickster','Zorro']
+  },
+  {
+    id:'basilisco', icon:'👁️', nombre:'Basilisco', origen:'Mitología Greco-Medieval',
+    mitologia:'griega', tipo:'Reptil Letal',
+    descripcion:'El rey de las serpientes — cuya mirada mata instantáneamente. Su aliento envenena el aire y su contacto pudre la carne. Solo su propio reflejo puede destruirlo.',
+    lore:'Plinio el Viejo describió al Basilisco como una serpiente con corona de escamas. En la Edad Media creció hasta convertirse en un gallo con cola de serpiente (Cocatriz). Su veneno era tan potente que mató a Alejandro Magno, según algunos textos. Solo la comadreja, el gallo y su reflejo podían derrotarlo.',
+    poderes:['Mirada letal','Aliento venenoso','Veneno en contacto','Presencia que pudre la tierra'],
+    debilidades:['Su propio reflejo','Canto del gallo','Comadreja'],
+    traits:['Veneno','Griega','Mirada Mortal','Reptil']
+  },
+  {
+    id:'tezcatlipoca', icon:'🌑', nombre:'Tezcatlipoca', origen:'Mitología Azteca',
+    mitologia:'azteca', tipo:'Dios Oscuro',
+    descripcion:'Señor de la noche, el cielo nocturno y el conflicto. Rival eterno de Quetzalcóatl. Su espejo de obsidiana veía todo lo que ocurría en el mundo — y mostraba el destino.',
+    lore:'Tezcatlipoca perdió su pie en la boca del monstruo primordial Cipactli cuando se creó el mundo. Lo reemplazó con un espejo de obsidiana. Engañó a Quetzalcóatl para que bebiera pulque y cometiera incesto. Representa el lado oscuro del cosmos, necesario para el equilibrio. Su nagual era el jaguar.',
+    poderes:['Espejo omnisciente','Control de la noche','Forma de jaguar','Ilusiones','Destino'],
+    debilidades:['La luz solar directa (debilita su oscuridad)'],
+    traits:['Oscuridad','Azteca','Divino','Jaguar']
+  },
+  {
+    id:'peryton', icon:'🦌', nombre:'Perytón', origen:'Bestiario Medieval',
+    mitologia:'otra', tipo:'Ciervo Alado',
+    descripcion:'Ciervo con alas de ave y plumaje verde. Su sombra tiene forma de hombre — rastro de las almas de los atlantes muertos. Solo puede ser matado por un humano que ya haya matado antes.',
+    lore:'El Perytón aparece en el "Libro de los seres imaginarios" de Borges, quien lo atribuyó a un manuscrito árabe perdido. Habitaba en la Atlántida. Cuando la isla se hundió, los Perytons fueron los únicos sobrevivientes. Son extremadamente agresivos con los humanos, de quienes guardan un rencor ancestral.',
+    poderes:['Vuelo silencioso','Sombra de hombre (desorienta)','Fuerza de ciervo','Velocidad sobrenatural'],
+    debilidades:['Solo puede morir ante alguien que ya haya matado'],
+    traits:['Alas','Medieval','Misterioso','Ciervo']
+  },
+  {
+    id:'manticora', icon:'🦂', nombre:'Mantícora', origen:'Mitología Persa / Medieval',
+    mitologia:'otra', tipo:'Bestia Compuesta',
+    descripcion:'Cuerpo de león, cabeza de hombre con tres filas de dientes, cola de escorpión con espinas venenosas que puede disparar. Voz que imita al humano para atraer a sus presas.',
+    lore:'El nombre viene del persa "mardkhora" — devorador de hombres. Marco Polo la describió en sus viajes. La Mantícora no deja huesos — devora a sus víctimas por completo. Su voz puede imitar cualquier sonido humano. En el bestiario medieval representaba el tirano que consume a su pueblo.',
+    poderes:['Disparar espinas venenosas','Voz humana imitada','Tres filas de dientes','Velocidad felina'],
+    debilidades:['Inteligencia limitada','Vanidad ante el elogio'],
+    traits:['Veneno','Persa','Híbrido','Cazador']
+  },
+];
+
+// ==================== ESTADO ====================
+let filtroActivo = 'todos';
+let todasMostradas = [...CRIATURAS];
+
+// ==================== RENDER ====================
+function render(lista) {
+  const grid = document.getElementById('mainGrid');
+  document.getElementById('countLbl').textContent = `${lista.length} criatura${lista.length!==1?'s':''}`;
+
+  if(!lista.length){
+    grid.innerHTML = `<div class="creatures-grid"><div class="empty-msg">📜 No se encontraron criaturas con ese filtro...</div></div>`;
+    return;
+  }
+
+  // Separar dragones del resto
+  const dragones = lista.filter(c=>c.mitologia==='dragon');
+  const resto = lista.filter(c=>c.mitologia!=='dragon');
+
+  let html = '';
+
+  if(dragones.length){
+    html += `
+      <div class="section-header reveal">
+        <span class="section-header-title">🐉 DRAGONES DEL MUNDO</span>
+        <div class="section-header-line"></div>
+      </div>
+      <div class="creatures-grid">
+        ${dragones.map((c,i)=>cardHTML(c,i)).join('')}
+      </div>`;
+  }
+
+  if(resto.length){
+    html += `
+      <div class="divider" style="margin:1rem 0;"></div>
+      <div class="section-header reveal">
+        <span class="section-header-title">⚔️ OTRAS CRIATURAS MÍTICAS</span>
+        <div class="section-header-line"></div>
+      </div>
+      <div class="creatures-grid">
+        ${resto.map((c,i)=>cardHTML(c,i)).join('')}
+      </div>`;
+  }
+
+  grid.innerHTML = html;
+  grid.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+  grid.querySelectorAll('.creature-card').forEach(card=>{
+    card.addEventListener('mousemove',e=>{
+      const r=card.getBoundingClientRect();
+      card.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');
+      card.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');
+    });
+  });
+}
+
+function cardHTML(c, i){
+  return `
+    <div class="creature-card reveal" onclick="abrirModal('${c.id}')" style="transition-delay:${i*0.04}s">
+      <div class="card-top">
+        <span class="card-icon">${c.icon}</span>
+        <div class="card-badges">
+          <span class="badge-myth">${c.origen.split('/')[0].trim()}</span>
+          <span class="badge-type">${c.tipo}</span>
+        </div>
+      </div>
+      <div class="card-name">${c.nombre}</div>
+      <div class="card-origin">✦ ${c.origen}</div>
+      <div class="card-desc">${c.descripcion}</div>
+      <div class="card-traits">${c.traits.map(t=>`<span class="trait">${t}</span>`).join('')}</div>
+      <a href="galeria.html" class="card-btn" onclick="event.stopPropagation()">🐉 VER EN LA GALERÍA</a>
+    </div>`;
+}
+
+// ==================== FILTROS ====================
+function filtrar(){
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  let lista = CRIATURAS;
+  if(filtroActivo !== 'todos') lista = lista.filter(c=>c.mitologia===filtroActivo||c.traits.some(t=>t.toLowerCase().includes(filtroActivo)));
+  if(q) lista = lista.filter(c=>
+    c.nombre.toLowerCase().includes(q)||
+    c.origen.toLowerCase().includes(q)||
+    c.descripcion.toLowerCase().includes(q)||
+    c.traits.some(t=>t.toLowerCase().includes(q))
+  );
+  todasMostradas = lista;
+  render(lista);
+}
+
+function setFiltro(f, btn){
+  filtroActivo=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  filtrar();
+}
+
+// ==================== MODAL ====================
+function abrirModal(id){
+  const c = CRIATURAS.find(x=>x.id===id);
+  if(!c) return;
+  document.getElementById('modalBody').innerHTML = `
+    <span class="modal-icon">${c.icon}</span>
+    <div class="modal-name">${c.nombre}</div>
+    <div class="modal-origin">${c.origen} · ${c.tipo}</div>
+    <div class="modal-sec">
+      <div class="modal-sec-title">📜 DESCRIPCIÓN</div>
+      <div class="modal-text">${c.descripcion}</div>
+    </div>
+    <div class="modal-sec">
+      <div class="modal-sec-title">📖 LORE COMPLETO</div>
+      <div class="modal-text">${c.lore}</div>
+    </div>
+    <div class="modal-sec">
+      <div class="modal-sec-title">⚡ PODERES</div>
+      <div class="modal-traits">${c.poderes.map(p=>`<span class="modal-trait">✦ ${p}</span>`).join('')}</div>
+    </div>
+    <div class="modal-sec">
+      <div class="modal-sec-title">⚖️ DEBILIDADES</div>
+      <div class="modal-traits">${c.debilidades.map(d=>`<span class="modal-trait">• ${d}</span>`).join('')}</div>
+    </div>
+    <div class="modal-footer">
+      <a href="galeria.html" class="modal-galeria-btn">🐉 VER SI YA EXISTE EN EL JUEGO</a>
+      &nbsp;&nbsp;
+      <a href="index.html?ref=${encodeURIComponent(c.nombre)}" class="modal-galeria-btn" style="background:linear-gradient(135deg,rgba(100,60,0,0.5),rgba(60,30,0,0.5));">📋 ENVIAR PETICIÓN BASADA EN ESTA CRIATURA</a>
+    </div>
+  `;
+  document.getElementById('modalOverlay').classList.add('show');
+  document.body.style.overflow='hidden';
+}
+
+function closeModal(e){
+  if(e&&e.target!==document.getElementById('modalOverlay')) return;
+  document.getElementById('modalOverlay').classList.remove('show');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal({target:document.getElementById('modalOverlay')});});
+
+// ==================== FONDO ====================
+const bgCanvas=document.getElementById('bgCanvas');
+const bgCtx=bgCanvas.getContext('2d');
+bgCanvas.width=window.innerWidth;bgCanvas.height=window.innerHeight;
+window.addEventListener('resize',()=>{bgCanvas.width=window.innerWidth;bgCanvas.height=window.innerHeight;});
+const embers=Array.from({length:50},()=>({x:Math.random()*window.innerWidth,y:window.innerHeight+Math.random()*100,size:Math.random()*1.5+0.3,speed:Math.random()*0.4+0.1,drift:(Math.random()-0.5)*0.3,alpha:Math.random()*0.25+0.03,hue:Math.random()*30+20}));
+function animBg(){bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);embers.forEach(e=>{e.y-=e.speed;e.x+=e.drift;e.alpha+=(Math.random()-0.5)*0.01;e.alpha=Math.max(0.02,Math.min(0.3,e.alpha));if(e.y<-10){e.y=bgCanvas.height+10;e.x=Math.random()*bgCanvas.width;}bgCtx.beginPath();bgCtx.arc(e.x,e.y,e.size,0,Math.PI*2);bgCtx.fillStyle=`hsla(${e.hue},80%,55%,${e.alpha})`;bgCtx.fill();});requestAnimationFrame(animBg);}
+animBg();
+
+// ==================== RUNAS FLOTANTES ====================
+const runas = ['𝔇','𝔯','𝔞','𝔤','ᚠ','ᚢ','ᚦ','ᚨ','ᚱ','ᚲ','ᚷ','ᚹ','ᚺ','ᚾ','ᛁ','ᛃ','ᛇ','ᛈ','ᛉ','ᛊ','ᛏ','ᛒ','ᛖ','ᛗ','ᛚ','ᛜ','ᛞ','ᛟ'];
+const runeBg = document.getElementById('runeBg');
+for(let i=0;i<12;i++){
+  const el=document.createElement('div');
+  el.className='rune-char';
+  el.textContent=runas[Math.floor(Math.random()*runas.length)];
+  el.style.left=Math.random()*100+'%';
+  el.style.animationDuration=(25+Math.random()*30)+'s';
+  el.style.animationDelay=-(Math.random()*40)+'s';
+  el.style.fontSize=(2+Math.random()*5)+'rem';
+  runeBg.appendChild(el);
+}
+
+// ==================== REVEAL ====================
+const obs=new IntersectionObserver(entries=>{entries.forEach((en,i)=>{if(en.isIntersecting){setTimeout(()=>en.target.classList.add('visible'),i*60);obs.unobserve(en.target);}});},{threshold:0.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// Init
+render(CRIATURAS);
+</script>
+</body>
+</html>
