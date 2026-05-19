@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Espejo Roto</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Cormorant+SC:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void: #03020a;
+  --abyss: #080614;
+  --deep: #0f0c1c;
+  --surface: #16122a;
+  --silver: #b8b4cc;
+  --mist: #6a6680;
+  --crack: #2a2440;
+  --glow-soft: rgba(180,170,220,0.07);
+  --accent: #c9c0e8;
+  --accent-dim: rgba(180,170,220,0.3);
+  --mirror: rgba(200,195,230,0.06);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--void);
+  color: var(--silver);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.15rem;
+  line-height: 1.9;
+  overflow-x: hidden;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'%3E%3Ccircle cx='10' cy='10' r='3' fill='none' stroke='rgba(180,170,220,0.6)' stroke-width='1'/%3E%3C/svg%3E") 10 10, default;
+}
+
+/* ── GRAIN ── */
+body::after {
+  content:''; position:fixed; inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='0.05'/%3E%3C/svg%3E");
+  pointer-events:none; z-index:999; opacity:0.4; mix-blend-mode:overlay;
+}
+
+/* ── MIRROR SVG BACKGROUND ── */
+.mirror-bg {
+  position:fixed; top:0; left:50%; transform:translateX(-50%);
+  width:600px; height:100vh; pointer-events:none; z-index:0; opacity:0.18;
+}
+
+/* ── HERO ── */
+.hero {
+  position:relative; z-index:1;
+  min-height:100vh;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  text-align:center; padding:4rem 2rem;
+  overflow:hidden;
+}
+
+.hero::before {
+  content:'';position:absolute;
+  width:500px;height:700px;
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  background: radial-gradient(ellipse, rgba(140,120,210,0.06) 0%, transparent 65%);
+  pointer-events:none;
+}
+
+.hero-kicker {
+  font-family:'Cormorant SC', serif;
+  font-size:0.7rem; letter-spacing:0.45em; text-transform:uppercase;
+  color: var(--mist); margin-bottom:2.5rem;
+  animation: riseIn 1.4s ease both;
+}
+
+.mirror-frame {
+  position:relative; margin-bottom:3rem;
+  animation: riseIn 1.4s 0.3s ease both;
+}
+
+/* SVG mirror illustration */
+.mirror-svg { width:160px; filter:drop-shadow(0 0 30px rgba(150,130,220,0.2)); }
+
+.hero-title {
+  font-family:'Cormorant SC', serif;
+  font-size: clamp(3rem, 9vw, 7rem);
+  font-weight:300; letter-spacing:0.08em;
+  color:#fff;
+  text-shadow: 0 0 80px rgba(150,130,220,0.2);
+  line-height:1;
+  animation: riseIn 1.4s 0.5s ease both;
+}
+
+.hero-title span {
+  display:block; font-style:italic; font-weight:300;
+  font-size:0.45em; letter-spacing:0.25em;
+  color:var(--mist); margin-top:0.4rem;
+}
+
+.hero-intro {
+  max-width:520px; margin:2.5rem auto 0;
+  font-style:italic; font-size:1.1rem;
+  color:var(--mist); line-height:1.8;
+  animation: riseIn 1.4s 0.8s ease both;
+}
+
+.begin-hint {
+  position:absolute; bottom:2.5rem;
+  font-family:'Cormorant SC', serif;
+  font-size:0.65rem; letter-spacing:0.35em; text-transform:uppercase;
+  color:rgba(180,170,220,0.25);
+  animation: breathe 3s ease-in-out infinite 2s;
+}
+
+/* ── PRELUDE ── */
+.prelude {
+  position:relative; z-index:1;
+  max-width:680px; margin:0 auto;
+  padding:5rem 2rem 3rem;
+  text-align:center;
+}
+
+.prelude p {
+  font-style:italic; color:var(--mist);
+  font-size:1.05rem; line-height:1.9;
+}
+
+.ornament {
+  font-size:1.4rem; color:var(--crack);
+  letter-spacing:0.6em; text-align:center;
+  margin:2.5rem 0;
+}
+
+/* ── QUESTION BLOCK ── */
+.question-block {
+  position:relative; z-index:1;
+  max-width:740px; margin:0 auto;
+  padding:3rem 2rem;
+  opacity:0; transform:translateY(32px);
+  transition: opacity 1s ease, transform 1s ease;
+}
+
+.question-block.visible { opacity:1; transform:none; }
+
+.q-number {
+  font-family:'Cormorant SC', serif;
+  font-size:0.62rem; letter-spacing:0.5em; text-transform:uppercase;
+  color:rgba(180,170,220,0.2); margin-bottom:1.5rem;
+  display:flex; align-items:center; gap:1rem;
+}
+.q-number::before, .q-number::after {
+  content:''; flex:1; height:1px;
+  background:linear-gradient(to right, transparent, rgba(180,170,220,0.08), transparent);
+}
+
+.q-text {
+  font-family:'Cormorant Garamond', serif;
+  font-size: clamp(1.5rem, 3.5vw, 2.4rem);
+  font-weight:300; font-style:italic;
+  color:#e8e4f4;
+  line-height:1.45; text-align:center;
+  margin-bottom:2rem;
+}
+
+.q-meditation {
+  font-size:0.98rem; color:var(--mist);
+  text-align:center; line-height:1.85;
+  font-style:italic;
+  max-width:580px; margin:0 auto;
+  padding:1.5rem 2rem;
+  border-top:1px solid rgba(180,170,220,0.06);
+  border-bottom:1px solid rgba(180,170,220,0.06);
+}
+
+.q-silence {
+  text-align:center; margin-top:1.8rem;
+  font-family:'Cormorant SC', serif;
+  font-size:0.58rem; letter-spacing:0.4em; text-transform:uppercase;
+  color:rgba(180,170,220,0.15);
+}
+
+/* crack line between questions */
+.crack-divider {
+  position:relative; z-index:1;
+  max-width:400px; margin:0 auto;
+  height:60px; display:flex; align-items:center; justify-content:center;
+}
+
+.crack-divider svg { width:100%; opacity:0.2; }
+
+/* ── CLOSING ── */
+.closing {
+  position:relative; z-index:1;
+  max-width:620px; margin:0 auto;
+  padding:5rem 2rem 8rem;
+  text-align:center;
+  opacity:0; transform:translateY(24px);
+  transition: opacity 1.2s ease, transform 1.2s ease;
+}
+
+.closing.visible { opacity:1; transform:none; }
+
+.closing-title {
+  font-family:'Cormorant SC', serif;
+  font-size:clamp(1.8rem,4vw,3rem);
+  font-weight:300; color:#fff;
+  letter-spacing:0.12em; margin-bottom:1.5rem;
+}
+
+.closing p {
+  font-style:italic; color:var(--mist);
+  font-size:1.05rem; line-height:1.9;
+  margin-bottom:1.2rem;
+}
+
+.closing-quote {
+  margin-top:2.5rem; padding:1.5rem 2rem;
+  border:1px solid rgba(180,170,220,0.08);
+  font-style:italic; font-size:1.15rem;
+  color:rgba(220,215,240,0.5);
+  position:relative;
+}
+
+.closing-quote::before {
+  content:'"'; position:absolute;
+  top:-1rem; left:1.5rem;
+  font-size:3rem; color:rgba(180,170,220,0.1);
+  font-family:'Cormorant Garamond', serif; line-height:1;
+}
+
+/* ── SUPPORT ── */
+.support {
+  position:relative; z-index:1;
+  background:rgba(12,9,24,0.8);
+  border-top:1px solid rgba(180,170,220,0.06);
+  padding:4rem 2rem;
+  text-align:center;
+}
+
+.support-inner { max-width:440px; margin:0 auto; }
+
+.support h3 {
+  font-family:'Cormorant SC', serif;
+  font-size:1.4rem; font-weight:300;
+  color:#e8e4f4; margin-bottom:0.6rem;
+}
+
+.support p {
+  font-style:italic; color:var(--mist);
+  font-size:0.95rem; margin-bottom:2rem; line-height:1.7;
+}
+
+.support-btns { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
+
+.btn-s {
+  display:inline-flex; align-items:center; gap:0.5rem;
+  padding:0.7rem 1.8rem;
+  font-family:'Cormorant SC', serif;
+  font-size:0.85rem; letter-spacing:0.1em;
+  text-decoration:none; transition:all 0.3s;
+  border:1px solid;
+}
+
+.btn-paypal { border-color:rgba(180,170,220,0.2); color:var(--accent-dim); }
+.btn-paypal:hover { border-color:var(--accent-dim); color:var(--accent); background:rgba(180,170,220,0.04); }
+
+.btn-kofi { border-color:rgba(180,170,220,0.12); color:rgba(180,170,220,0.35); }
+.btn-kofi:hover { border-color:rgba(180,170,220,0.25); color:var(--mist); }
+
+/* ── FOOTER ── */
+footer {
+  position:relative; z-index:1;
+  text-align:center; padding:2.5rem 2rem;
+  font-family:'Cormorant SC', serif;
+  font-size:0.65rem; letter-spacing:0.2em; text-transform:uppercase;
+  color:rgba(180,170,220,0.15);
+  border-top:1px solid rgba(180,170,220,0.04);
+}
+
+footer a { color:rgba(180,170,220,0.25); text-decoration:none; }
+
+/* ── ANIMATIONS ── */
+@keyframes riseIn {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:none; }
+}
+
+@keyframes breathe {
+  0%,100% { opacity:0.25; }
+  50%      { opacity:0.6; }
+}
+
+@keyframes shimmer {
+  0%   { opacity:0.08; }
+  50%  { opacity:0.18; }
+  100% { opacity:0.08; }
+}
+
+@keyframes crackGlow {
+  0%,100% { filter:drop-shadow(0 0 4px rgba(180,170,220,0.1)); }
+  50%     { filter:drop-shadow(0 0 12px rgba(180,170,220,0.25)); }
+}
+</style>
+</head>
+<body>
+
+<!-- MIRROR BACKGROUND -->
+<svg class="mirror-bg" viewBox="0 0 600 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="mirrorGlow" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="rgba(180,170,220,0.15)"/>
+      <stop offset="100%" stop-color="rgba(180,170,220,0)"/>
+    </radialGradient>
+  </defs>
+  <!-- mirror oval shape -->
+  <ellipse cx="300" cy="380" rx="160" ry="240" fill="none" stroke="rgba(180,170,220,0.08)" stroke-width="1"/>
+  <ellipse cx="300" cy="380" rx="150" ry="230" fill="url(#mirrorGlow)"/>
+  <!-- cracks -->
+  <path d="M300 150 L285 210 L305 270 L278 340" fill="none" stroke="rgba(180,170,220,0.12)" stroke-width="0.8"/>
+  <path d="M300 150 L318 230 L302 280 L325 360" fill="none" stroke="rgba(180,170,220,0.08)" stroke-width="0.6"/>
+  <path d="M278 340 L240 380 L210 410" fill="none" stroke="rgba(180,170,220,0.06)" stroke-width="0.5"/>
+  <path d="M325 360 L365 400 L395 420" fill="none" stroke="rgba(180,170,220,0.06)" stroke-width="0.5"/>
+  <!-- mirror frame -->
+  <ellipse cx="300" cy="380" rx="165" ry="245" fill="none" stroke="rgba(180,170,220,0.05)" stroke-width="2"/>
+  <!-- top ornament -->
+  <line x1="300" y1="130" x2="300" y2="105" stroke="rgba(180,170,220,0.1)" stroke-width="1"/>
+  <circle cx="300" cy="102" r="4" fill="none" stroke="rgba(180,170,220,0.15)" stroke-width="0.8"/>
+</svg>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <p class="hero-kicker">Un experimento de introspección</p>
+
+  <div class="mirror-frame">
+    <svg class="mirror-svg" viewBox="0 0 160 220" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="mg" cx="40%" cy="35%" r="60%">
+          <stop offset="0%" stop-color="rgba(200,190,240,0.12)"/>
+          <stop offset="100%" stop-color="rgba(200,190,240,0.02)"/>
+        </radialGradient>
+      </defs>
+      <ellipse cx="80" cy="108" rx="58" ry="88" fill="url(#mg)" stroke="rgba(200,190,240,0.25)" stroke-width="1"/>
+      <ellipse cx="80" cy="108" rx="62" ry="92" fill="none" stroke="rgba(200,190,240,0.1)" stroke-width="1.5"/>
+      <!-- cracks -->
+      <path d="M80 22 L70 55 L82 88 L65 120" fill="none" stroke="rgba(200,190,240,0.3)" stroke-width="0.8"/>
+      <path d="M80 22 L92 60 L78 90 L96 125" fill="none" stroke="rgba(200,190,240,0.2)" stroke-width="0.6"/>
+      <path d="M65 120 L42 145 L30 158" fill="none" stroke="rgba(200,190,240,0.15)" stroke-width="0.5"/>
+      <path d="M96 125 L118 148 L132 162" fill="none" stroke="rgba(200,190,240,0.12)" stroke-width="0.5"/>
+      <!-- stand -->
+      <line x1="80" y1="196" x2="80" y2="214" stroke="rgba(200,190,240,0.2)" stroke-width="1.5"/>
+      <line x1="55" y1="214" x2="105" y2="214" stroke="rgba(200,190,240,0.2)" stroke-width="1"/>
+      <!-- top gem -->
+      <circle cx="80" cy="18" r="5" fill="none" stroke="rgba(200,190,240,0.3)" stroke-width="0.8"/>
+      <circle cx="80" cy="18" r="2" fill="rgba(200,190,240,0.2)"/>
+    </svg>
+  </div>
+
+  <h1 class="hero-title">El Espejo Roto <span>Quaestiones sine fine</span></h1>
+
+  <p class="hero-intro">No hay respuestas correctas aquí. Solo preguntas que el espejo devuelve — y tú decides si mirar.</p>
+
+  <p class="begin-hint">↓ desciende ↓</p>
+</section>
+
+<!-- PRELUDE -->
+<div class="prelude">
+  <p>Un espejo roto no miente. Al contrario: te muestra en pedazos, desde ángulos que nunca elegiste ver. Estas preguntas son esos fragmentos. No te piden que respondas en voz alta. Solo que te detengas. Un momento. Y mires.</p>
+  <div class="ornament">· · ·</div>
+</div>
+
+<!-- ══ PREGUNTAS ══ -->
+
+<!-- 1 -->
+<div class="question-block" id="q1">
+  <div class="q-number">Fragmento I</div>
+  <p class="q-text">¿Qué harías diferente si supieras que nadie — jamás — se va a enterar?</p>
+  <div class="q-meditation">
+    No lo que deberías hacer. No lo que está bien. Lo que realmente harías. La distancia entre esas dos respuestas tiene un nombre, y ese nombre eres tú.
+  </div>
+  <p class="q-silence">— silencio recomendado —</p>
+</div>
+
+<div class="crack-divider">
+  <svg viewBox="0 0 400 30" xmlns="http://www.w3.org/2000/svg"><path d="M0 15 L120 15 L140 8 L160 20 L175 12 L195 18 L210 15 L400 15" fill="none" stroke="rgba(180,170,220,0.15)" stroke-width="0.8"/></svg>
+</div>
+
+<!-- 2 -->
+<div class="question-block" id="q2">
+  <div class="q-number">Fragmento II</div>
+  <p class="q-text">¿De qué tienes miedo que todavía no le has puesto nombre?</p>
+  <div class="q-meditation">
+    Los miedos sin nombre son los más grandes. No porque sean peores, sino porque sin nombre no podemos mirarlos. Y lo que no miramos nos dirige.
+  </div>
+  <p class="q-silence">— silencio recomendado —</p>
+</div>
+
+<div class="crack-divider">
+  <svg viewBox="0 0 400 30" xmlns="http://www.w3.org/2000/svg"><path d="M0 15 L90 15 L115 20 L135 10 L155 18 L170 13 L200 15 L400 15" fill="none" stroke="rgba(180,170,220,0.15)" stroke-width="0.8"/></svg>
+</div>
+
+<!-- 3 -->
+<div class="question-block" id="q3">
+  <div class="q-number">Fragmento III</div>
+  <p class="q-text">Si tu existencia terminara mañana, ¿qué quedaría sin decirse?</p>
+  <div class="q-meditation">
+    No objetos. No logros. Palabras. Las que guardaste porque había tiempo, porque era incómodo, porque no sabías cómo. El silencio que dejamos también tiene forma.
+  </div>
+  <p class="q-silence">— silencio recomendado —</p>
+</div>
+
+<div class="crack-divider">
+  <svg viewBox="0 0 400 30" xmlns="http://www.w3.org/2000/svg"><path d="M0 15 L100 15 L125 7 L145 22 L162 11 L185 17 L205 15 L400 15" fill="none" stroke="rgba(180,170,220,0.15)" stroke-width="0.8"/></svg>
+</div>
+
+<!-- 4 -->
+<div class="question-block" id="q4">
+  <div class="q-number">Fragmento IV</div>
+  <p class="q-text">¿Cuándo fue la última vez que actuaste contra lo que sentías, solo para encajar?</p>
+  <div class="q-meditation">
+    No hay juicio en la pregunta. Todos lo hacemos. Pero hay diferencia entre adaptarse y disolverse. ¿Recuerdas cuándo empezó la línea a borrarse?
+  </div>
+  <p class="q-silence">— silencio recomendado —</p>
+</div>
+
+<div class="crack-divider">
+  <svg viewBox="0 0 400 30" xmlns="http://www.w3.org/2000/svg"><path d="M0 15 L80 15 L105 18 L130 9 L148 16 L170 12 L195 15 L400 15" fill="none" stroke="rgba(180,170,220,0.15)" stroke-width="0.8"/></svg>
+</div>
+
+<!-- 5 -->
+<div class="question-block" id="q5">
+  <div class="q-number">Fragmento V</div>
+  <p class="q-text">¿Hay algo que defiendes en público y que en privado ya no crees?</p>
+  <div class="q-meditation">
+    Las ideas también envejecen. Pero a veces las seguimos cargando porque soltarlas significaría admitir que fuimos diferentes. Como si cambiar de idea fuera una traición y no una señal de que estás vivo.
+  </div>
+  <p class="q-silence">— silencio recomendado —</p>
+</div>
+
+<div class="crack-divider">
+  <svg viewBox="0 0 400 30" xmlns="http://www.w3.org/2000/svg"><path d="M0 15 L110 15 L130 6 L152 21 L168 13 L190 18 L210 15 L400 15" fill="none" stroke="rgba(180,170,220,0.15)" stroke-width="0.8"/></svg>
+</div>
+
+<!-- 6 -->
+<div class="question-block" id="q6">
+  <div class="q-number">Fragmento VI</div>
+  <p class="q-text">¿A quién llevas dentro de ti que ya no está, y que sigue tomando decisiones por ti?</p>
+  <div class="q-meditation">
+    Una voz aprendida. Una persona que te marcó. Una herida vieja que ya no sangra pero que todavía decide a qué le tienes miedo, a qué le corres, a qué no te permites acercarte.
+  </div>
+  <p class="q-silence">— silencio recomendado —</p>
+</div>
+
+<div class="crack-divider">
+  <svg viewBox="0 0 400 30" xmlns="http://www.w3.org/2000/svg"><path d="M0 15 L95 15 L118 11 L140 19 L158 14 L178 17 L200 15 L400 15" fill="none" stroke="rgba(180,170,220,0.15)" stroke-width="0.8"/></svg>
+</div>
+
+<!-- 7 -->
+<div class="question-block" id="q7">
+  <div class="q-number">Fragmento VII</div>
+  <p class="q-text">Si pudieras vivir sin ser visto por nadie, ¿vivirías distinto?</p>
+  <div class="q-meditation">
+    No en lo grande. En lo pequeño. En lo cotidiano. La respuesta honesta a esta pregunta dice más sobre quién eres que cualquier cosa que hayas dicho en voz alta.
+  </div>
+  <p class="q-silence">— silencio recomendado —</p>
+</div>
+
+<div class="crack-divider">
+  <svg viewBox="0 0 400 30" xmlns="http://www.w3.org/2000/svg"><path d="M0 15 L75 15 L100 20 L122 8 L145 17 L165 12 L185 15 L400 15" fill="none" stroke="rgba(180,170,220,0.15)" stroke-width="0.8"/></svg>
+</div>
+
+<!-- 8 -->
+<div class="question-block" id="q8">
+  <div class="q-number">Fragmento VIII</div>
+  <p class="q-text">¿Qué parte de ti has estado esperando que alguien más te dé permiso de ser?</p>
+  <div class="q-meditation">
+    Hay versiones de nosotros que postergamos porque sentimos que no tenemos el derecho todavía. Que falta algo: más edad, más éxito, más aprobación. ¿Qué esperas exactamente?
+  </div>
+  <p class="q-silence">— silencio recomendado —</p>
+</div>
+
+<!-- CLOSING -->
+<div class="closing" id="closing">
+  <div class="ornament" style="margin-bottom:2.5rem;">· · · · ·</div>
+  <h2 class="closing-title">El espejo no responde.</h2>
+  <p>Solo devuelve lo que hay frente a él. Estas preguntas no tienen respuesta correcta porque no son para ser respondidas — son para ser sentidas. Para que algo dentro de ti se mueva un poco.</p>
+  <p>Si algo te incomodó, probablemente era necesario. Si algo te alivió, también.</p>
+  <div class="closing-quote">
+    Conocerse no es llegar a una conclusión. Es aprender a sentarse con las preguntas sin que el silencio duela tanto.
+  </div>
+</div>
+
+<!-- SUPPORT -->
+<div class="support">
+  <div class="support-inner">
+    <h3>¿Te hizo detenerte?</h3>
+    <p>Este espacio existe de forma independiente. Si quieres que sigan existiendo estos experimentos de introspección, puedes apoyar con lo que puedas.</p>
+    <div class="support-btns">
+      <a href="https://www.paypal.com/paypalme/DragonPrimordial" class="btn-s btn-paypal" target="_blank">
+        ✦ PayPal
+      </a>
+      <a href="https://ko-fi.com/dragonprimordial" class="btn-s btn-kofi" target="_blank">
+        ☕ Ko-fi
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>El Espejo Roto &nbsp;·&nbsp; <a href="#">Dragón Primordial</a> &nbsp;·&nbsp; Un fragmento a la vez</p>
+</footer>
+
+<script>
+// Scroll reveal
+const blocks = document.querySelectorAll('.question-block, .closing');
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: 0.12 });
+blocks.forEach(b => obs.observe(b));
+
+// Subtle parallax on mirror bg
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  document.querySelector('.mirror-bg').style.transform = `translateX(-50%) translateY(${y * 0.08}px)`;
+});
+</script>
+</body>
+</html>
